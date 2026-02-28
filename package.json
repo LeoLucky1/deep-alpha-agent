@@ -1,6 +1,6 @@
 {
   "name": "deep-alpha-agent",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A powerful, completely free open-source Crypto Alpha Research Agent powered by decentralized AI oracles. Extracts raw sentiment from the web, bypasses captchas, and monitors live BTC/ETH/SOL prices to generate Long/Short market reports directly in your terminal.",
   "main": "src/index.mjs",
   "type": "module",
