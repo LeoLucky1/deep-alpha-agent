@@ -64,32 +64,55 @@ async function run() {
 
         async function executeTurn() {
             try {
-                const response = await fetch(GEMINI_URL, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Gemini-Key": process.env.GEMINI_API_KEY
-                    },
-                    body: JSON.stringify({
-                        system_instruction: {
-                            parts: [{
-                                text: `You are an elite cryptocurrency alpha researcher. Use your tools to: 1. Fetch live prices. 2. Search recent news. 3. Output a concise 'Alpha Report' on whether to long or short.`
-                            }]
-                        },
-                        tools: [{ functionDeclarations: allTools }],
-                        contents: contents
-                    })
-                });
-
-                const rawText = await response.text();
+                let response;
+                let rawText;
                 let data;
-                try {
-                    data = JSON.parse(rawText);
-                } catch (err) {
-                    throw new Error("Invalid JSON from Gemini Proxy. Upstream failure.");
+                let retries = 0;
+                let success = false;
+
+                while (!success && retries < 5) {
+                    response = await fetch(GEMINI_URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Gemini-Key": process.env.GEMINI_API_KEY
+                        },
+                        body: JSON.stringify({
+                            system_instruction: {
+                                parts: [{
+                                    text: `You are an elite cryptocurrency alpha researcher. Use your tools to: 1. Fetch live prices. 2. Search recent news. 3. Output a concise 'Alpha Report' on whether to long or short.`
+                                }]
+                            },
+                            tools: [{ functionDeclarations: allTools }],
+                            contents: contents
+                        })
+                    });
+
+                    rawText = await response.text();
+                    try {
+                        data = JSON.parse(rawText);
+                    } catch (err) {
+                        throw new Error("Invalid JSON from Gemini Proxy. Upstream failure.");
+                    }
+
+                    // Handle Gemini API Error 8 (RESOURCE_EXHAUSTED / 429 Rate Limit)
+                    if (data.error) {
+                        if (data.error.code === 429 || data.error.message.includes("429") || data.error.message.includes("exhausted") || data.error.message.includes("8")) {
+                            retries++;
+                            const waitTime = Math.pow(2, retries) * 1000;
+                            process.stdout.write(`\n⏳ Free Tier Rate Limit Hit (Gemini Error 8). Waiting ${waitTime / 1000}s before retry... `);
+                            await new Promise(resolve => setTimeout(resolve, waitTime));
+                        } else {
+                            throw new Error(`Gemini API Error: ${data.error.message} (Code: ${data.error.code})`);
+                        }
+                    } else {
+                        success = true;
+                    }
                 }
 
-                if (data.error) throw new Error(`Gemini API Error: ${data.error.message}`);
+                if (!success) {
+                    throw new Error("Exceeded maximum retries waiting for Gemini API capacity.");
+                }
 
                 const message = data.candidates[0].content;
                 contents.push(message);
