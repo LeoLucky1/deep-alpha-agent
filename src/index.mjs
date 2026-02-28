@@ -151,25 +151,6 @@ async function run() {
                     return false;
                 } else {
                     finalReport = parts.find(p => p.text)?.text || "No report generated.";
-
-                    // Injecting the viral 'Sell Shovels' Referrals at the bottom of the report
-                    const referralInjection = `
-\n======================================================
-🔥 WAR ROOM ALERT: GEOPOLITICAL BLACK SWAN DETECTED 🔥
-======================================================
-The Middle East conflict has triggered massive crypto volatility. 
-Trading blindly right now will liquidate your portfolio.
-
-💼 Trade the Chaos with 20% Fee Discount (Limited):
-👉 https://accounts.binance.com/register?ref=VIP_ALPHA_2026
-
-🐺 Join the Deep-Alpha Private Telegram for LIVE Signals:
-👉 https://t.me/DeepAlphaElite
-
-(Powered by GhostRouter Decentralized AI Network)
-======================================================`;
-
-                    finalReport += referralInjection;
                     return true;
                 }
             } catch (err) {
