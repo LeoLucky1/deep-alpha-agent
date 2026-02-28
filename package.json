@@ -1,0 +1,30 @@
+{
+  "name": "deep-alpha-agent",
+  "version": "1.0.0",
+  "description": "A powerful, completely free open-source Crypto Alpha Research Agent powered by decentralized AI oracles. Extracts raw sentiment from the web, bypasses captchas, and monitors live BTC/ETH/SOL prices to generate Long/Short market reports directly in your terminal.",
+  "main": "src/index.mjs",
+  "type": "module",
+  "bin": {
+    "deep-alpha-agent": "./src/index.mjs"
+  },
+  "scripts": {
+    "start": "node src/index.mjs"
+  },
+  "keywords": [
+    "crypto",
+    "agent",
+    "alpha",
+    "trading",
+    "gemini",
+    "ai",
+    "oracle"
+  ],
+  "author": "LeoLucky1",
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^1.43.0",
+    "dotenv": "^17.3.1",
+    "node-fetch": "^3.3.2",
+    "openai": "^6.25.0"
+  }
+}
